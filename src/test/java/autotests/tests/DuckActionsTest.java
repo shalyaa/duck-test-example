@@ -1,6 +1,8 @@
 package autotests.tests;
 
 import autotests.clients.DuckActionsClient;
+import autotests.payloads.Duck;
+import autotests.payloads.WingState;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -17,14 +19,16 @@ public class DuckActionsTest extends DuckActionsClient {
     @Test(description = "Проверка того, что уточка поплыла")
     @CitrusTest
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner) {
-        createDuck(runner, "yellow", 0.15, "rubber", "quack", "FIXED");
+        Duck duck = new Duck().color("yellow").height(0.15).material("rubber").sound("quack").wingsState(WingState.FIXED);
+
+        createDuck(runner, duck);
         runner.$(http().client(yellowDuckService)
                 .receive()
                 .response(HttpStatus.OK)
                 .message()
                 .extract(fromBody().expression("$.id", "duckId")));
         duckSwim(runner, "${duckId}");
-        validateResponse(runner, "{\n" + "  \"message\": \"I'm swimming\"\n" + "}");
+        validateResponse(runner, "duckActionTest/successfulSwim.json");
     }
 
 
