@@ -1,36 +1,31 @@
 package autotests.tests;
 
 import autotests.clients.DuckActionsClient;
-import autotests.payloads.Duck;
-import autotests.payloads.WingState;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import org.springframework.http.HttpStatus;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
-import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static com.consol.citrus.container.FinallySequence.Builder.doFinally;
 
+@Epic("Тесты на duck-action-controller")
+@Feature("Эндпоинт /api/duck/action/fly")
 public class DuckActionsTest extends DuckActionsClient {
 
-
-    @Test(description = "РџСЂРѕРІРµСЂРєР° С‚РѕРіРѕ, С‡С‚Рѕ СѓС‚РѕС‡РєР° РїРѕРїР»С‹Р»Р°")
+    @Test(description = "Проверка того, что уточка поплыла")
     @CitrusTest
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner) {
-        Duck duck = new Duck().color("yellow").height(0.15).material("rubber").sound("quack").wingsState(WingState.FIXED);
+        runner.variable("duckId", "123");
+        runner.$(doFinally().actions(context ->
+                databaseUpdate(runner, "DELETE FROM DUCK WHERE ID=${duckId}")));
 
-        createDuck(runner, duck);
-        runner.$(http().client(yellowDuckService)
-                .receive()
-                .response(HttpStatus.OK)
-                .message()
-                .extract(fromBody().expression("$.id", "duckId")));
+        databaseUpdate(runner,"insert into DUCK (id, color, height, material, sound, wings_state)\n" +
+                "values (${duckId}, 'orange', 3.0, 'cheese', 'hrum','ACTIVE');");
+
         duckSwim(runner, "${duckId}");
         validateResponse(runner, "duckActionTest/successfulSwim.json");
     }
-
-
-
 }
