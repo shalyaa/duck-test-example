@@ -8,19 +8,23 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(fluent = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Duck {
 
     @JsonProperty("color")
     private String color;
 
     @JsonProperty("height")
-    private Double height;
+    private double height;
 
     @JsonProperty("material")
     private String material;
 
     @JsonProperty("sound")
     private String sound;
+
+    @JsonProperty
+    private String id;
 
     @JsonProperty("wingsState")
     private WingState wingsState;
