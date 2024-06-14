@@ -27,9 +27,10 @@ public class DuckCreateTest extends DuckActionsClient {
     @CitrusTest
     @CitrusParameters({"body", "response", "runner"})
     @Description("Первый")
-    public void firstCreateTest(Object duck, String response, @Optional @CitrusResource TestCaseRunner runner) {
+    public void firstCreateTest(Duck duck, String response, @Optional @CitrusResource TestCaseRunner runner) {
         createDuck(runner, duck);
         validateResponse(runner, response);
+        validateDuckInDatabase(runner, "${duckId}", duck.color(), String.valueOf(duck.height()), duck.material(), duck.sound(), String.valueOf(duck.wingsState()));
     }
 
     @Test(dataProvider = "secondCreateTest", description = "")
@@ -50,7 +51,8 @@ public class DuckCreateTest extends DuckActionsClient {
                 {duck2, "DuckCreateTest/createFirstTest/second.json", null},
                 {duck3, "DuckCreateTest/createFirstTest/third.json", null},
                 {duck4, "DuckCreateTest/createFirstTest/fourth.json", null},
-                {duck5, "DuckCreateTest/createFirstTest/fifth.json", null}};
+                {duck5, "DuckCreateTest/createFirstTest/fifth.json", null}
+        };
     }
 
     @DataProvider(name = "secondCreateTest")

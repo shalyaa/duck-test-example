@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static com.consol.citrus.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
 public class BaseTest extends TestNGCitrusSpringSupport {
 
@@ -52,13 +53,14 @@ public class BaseTest extends TestNGCitrusSpringSupport {
     }
 
     //Функция валидации всего json ответа с имеющимся в файле по указанному пути
-    public void validateFullResponse(TestCaseRunner runner, String expectedPayload, HttpClient URL) {
+    public void validateFullResponse(TestCaseRunner runner, String expectedPayload, HttpClient URL, String variableValue, String variableName) {
         runner.$(http().client(URL)
                 .receive()
                 .response()
                 .message()
                 .type(MessageType.JSON)
-                .body(new ClassPathResource(expectedPayload)));
+                .body(new ClassPathResource(expectedPayload))
+                .extract(fromBody().expression(variableValue, variableName)));
     }
 
     public void validateFullResponseFromTestData(TestCaseRunner runner, Object expectedPayload, HttpClient URL) {

@@ -16,6 +16,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 
 import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
+import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 import static com.consol.citrus.dsl.MessageSupport.MessageBodySupport.fromBody;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static org.eclipse.jetty.util.LazyList.contains;
@@ -42,7 +43,20 @@ public class DuckActionsClient extends BaseTest {
 
     @Step("Проверка полученного ответа")
     public void validateResponse(TestCaseRunner runner, String response) {
-        validateFullResponse(runner, response, yellowDuckService);
+        validateFullResponse(runner, response, yellowDuckService, "$.id", "duckId");
+    }
+
+    @Step("Валидация параметров уточки в БД.")
+    public void validateDuckInDatabase(TestCaseRunner runner, String id, String color, String height, String material,
+                                       String sound, String wingsState) {
+        runner.$(query(db)
+                .statement("SELECT * FROM DUCK WHERE ID =" + id)
+                .validate("COLOR", color)
+                .validate("HEIGHT", height)
+                .validate("MATERIAL", material)
+                .validate("SOUND", sound)
+                .validate("WINGS_STATE", wingsState)
+        );
     }
 
     @Step("Проверка полученного ответа")
